@@ -1,0 +1,222 @@
+DBHANDLER.JAVA
+package com.example.myapplication;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+
+public class DBHandler extends SQLiteOpenHelper {
+
+    private static final String DB_NAME = "coursedb";
+    private static final int DB_VERSION = 1;
+    private static final String TABLE_NAME = "mycourses";
+
+    private static final String ID_COL = "id";
+    private static final String NAME_COL = "name";
+    private static final String DURATION_COL = "duration";
+    private static final String DESCRIPTION_COL = "description";
+    private static final String TRACKS_COL = "tracks";
+
+    public DBHandler(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "CREATE TABLE " + TABLE_NAME + " ("
+                + ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NAME_COL + " TEXT,"
+                + DURATION_COL + " TEXT,"
+                + DESCRIPTION_COL + " TEXT,"
+                + TRACKS_COL + " TEXT)";
+        db.execSQL(query);
+    }
+
+    public void addNewCourse(String courseName, String courseDuration, String courseDescription, String courseTracks) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(NAME_COL, courseName);
+        values.put(DURATION_COL, courseDuration);
+        values.put(DESCRIPTION_COL, courseDescription);
+        values.put(TRACKS_COL, courseTracks);
+
+        db.insert(TABLE_NAME, null, values);
+        db.close();
+    }
+
+    public ArrayList<String> getAllCourses() {
+        ArrayList<String> courseList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String course = "ID: " + cursor.getInt(0) + "\n" +
+                        "Name: " + cursor.getString(1) + "\n" +
+                        "Duration: " + cursor.getString(2) + "\n" +
+                        "Description: " + cursor.getString(3) + "\n" +
+                        "Tracks: " + cursor.getString(4) + "\n";
+                courseList.add(course);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return courseList;
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+}
+MAIN_ACTIVITY.java
+package com.example.myapplication;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText courseNameEdt, courseTracksEdt, courseDurationEdt, courseDescriptionEdt;
+    private Button addCourseBtn;
+    private TextView courseListTxt;
+    private DBHandler dbHandler;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        courseNameEdt = findViewById(R.id.idEdtCourseName);
+        courseTracksEdt = findViewById(R.id.idEdtCourseTracks);
+        courseDurationEdt = findViewById(R.id.idEdtCourseDuration);
+        courseDescriptionEdt = findViewById(R.id.idEdtCourseDescription);
+        addCourseBtn = findViewById(R.id.idBtnAddCourse);
+        courseListTxt = findViewById(R.id.idTxtCourseList);
+
+        dbHandler = new DBHandler(MainActivity.this);
+
+        displayCourses();
+
+        addCourseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String courseName = courseNameEdt.getText().toString();
+                String courseTracks = courseTracksEdt.getText().toString();
+                String courseDuration = courseDurationEdt.getText().toString();
+                String courseDescription = courseDescriptionEdt.getText().toString();
+
+                if (courseName.isEmpty() || courseTracks.isEmpty() || courseDuration.isEmpty() || courseDescription.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter all the data..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                dbHandler.addNewCourse(courseName, courseDuration, courseDescription, courseTracks);
+                Toast.makeText(MainActivity.this, "Course has been added.", Toast.LENGTH_SHORT).show();
+
+                courseNameEdt.setText("");
+                courseDurationEdt.setText("");
+                courseTracksEdt.setText("");
+                courseDescriptionEdt.setText("");
+
+                displayCourses();
+            }
+        });
+    }
+
+    private void displayCourses() {
+        ArrayList<String> courses = dbHandler.getAllCourses();
+        StringBuilder coursesText = new StringBuilder();
+        for (String course : courses) {
+            coursesText.append(course).append("\n------------------\n");
+        }
+        courseListTxt.setText(coursesText.toString());
+    }
+}
+activity_main.xml:
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/idEdtCourseName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Course Name"/>
+
+    <EditText
+        android:id="@+id/idEdtCourseTracks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Course Tracks"/>
+
+    <EditText
+        android:id="@+id/idEdtCourseDuration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Course Duration"/>
+
+    <EditText
+        android:id="@+id/idEdtCourseDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Course Description"/>
+
+    <Button
+        android:id="@+id/idBtnAddCourse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Course"/>
+
+    <TextView
+        android:id="@+id/idTxtCourseList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:padding="10dp"
+        android:scrollbars="vertical"/>
+</LinearLayout>
+ANDROIDMANIFEST.xml:
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        tools:targetApi="31">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
