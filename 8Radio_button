@@ -1,64 +1,64 @@
-activity_main.xml :
+activity_main.xml
 
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:padding="20dp"
-android:gravity="center">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center">
 
-<TextView
-android:id="@+id/textView"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Select an option:"
-android:textSize="20sp"
-android:layout_marginBottom="20dp"/>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select an option:"
+        android:textSize="20sp"
+        android:layout_marginBottom="20dp" />
 
-<RadioGroup
-android:id="@+id/radioGroup"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content">
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-<RadioButton
-android:id="@+id/radioButton1"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="CST"/>
+        <RadioButton
+            android:id="@+id/radioButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CST" />
 
-<RadioButton
-android:id="@+id/radioButton2"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="CSE"/>
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CSE" />
 
-<RadioButton
-android:id="@+id/radioButton3"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="ECE"/>
-</RadioGroup>
+        <RadioButton
+            android:id="@+id/radioButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ECE" />
+    </RadioGroup>
 
-<Button
-android:id="@+id/buttonSubmit"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Submit"
-android:layout_marginTop="20dp"/>
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:layout_marginTop="20dp" />
 
-<TextView
-android:id="@+id/textViewResult"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text=""
-android:textSize="18sp"
-android:layout_marginTop="20dp"
-android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
 
-MainActivity.java :
+MainActivity.java
 
 package com.example.radiobuttonexample;
 
@@ -72,36 +72,38 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-private RadioGroup radioGroup;
-private Button buttonSubmit;
-private TextView textViewResult;
+    private RadioGroup radioGroup;
+    private Button buttonSubmit;
+    private TextView textViewResult;
 
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_main);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-// Initialize views
-radioGroup = findViewById(R.id.radioGroup);
-buttonSubmit = findViewById(R.id.buttonSubmit);
-textViewResult = findViewById(R.id.textViewResult);
+        // Initialize views
+        radioGroup = findViewById(R.id.radioGroup);
+        buttonSubmit = findViewById(R.id.buttonSubmit);
+        textViewResult = findViewById(R.id.textViewResult);
 
-// Set button click listener
-buttonSubmit.setOnClickListener(new View.OnClickListener() {
-@Override
-public void onClick(View v) {
-// Get the selected RadioButton ID
-int selectedId = radioGroup.getCheckedRadioButtonId();
+        // Set button click listener
+        buttonSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the selected RadioButton ID
+                int selectedId = radioGroup.getCheckedRadioButtonId();
 
-// Check if any option is selected
-if (selectedId == -1) {
-textViewResult.setText("Please select an option!");
-} else {
-// Get the selected RadioButton
-RadioButton radioButton = findViewById(selectedId);
-textViewResult.setText("Selected: " + radioButton.getText());
+                // Check if any option is selected
+                if (selectedId == -1) {
+                    textViewResult.setText("Please select an option!");
+                } else {
+                    // Get the selected RadioButton
+                    RadioButton radioButton = findViewById(selectedId);
+                    textViewResult.setText("Selected: " + radioButton.getText());
+                }
+            }
+        });
+    }
 }
-}
-});
-}
-}
+
+
